@@ -42,6 +42,19 @@ body {
   }
 }
 
+.bobby-logo {
+    width: 100px;
+    height: 14px;
+    background: url('../images/bobby.png') no-repeat transparent;
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2) {
+    .bobby-logo {
+        background: url('../images/bobby@2x.png') no-repeat transparent;
+        background-size: 100px 14px;
+    }
+}
+
 h1,h2,h3,h4,h5 {
   color: #fff;
   font-weight: 300;
@@ -80,16 +93,12 @@ h1,h2,h3,h4,h5 {
   font-size: 11px;
   margin-right: 2px;
 }
-
-.scroll-refresher {
-    background-color: rgba(0,0,0,0.4);
-}
-
 /*
 .ionic-refresher-content {
     color: rgb(255,255,255);
     text-shadow: none;
 }
+
 .scroll-refresher {
     overflow: visible;
 }
@@ -105,7 +114,6 @@ h1,h2,h3,h4,h5 {
 /**
  * Current weather
  */
-
 #current-weather {
   height: 180px;
   box-sizing: content-box;
@@ -217,6 +225,12 @@ h1,h2,h3,h4,h5 {
   float: right;
   margin-top: 4px;
   margin-right: 4px;
+}
+
+#forecast .bobby-logo {
+    float: right;
+    margin-top: 4px;
+    margin-right: 4px;
 }
 
 /**
