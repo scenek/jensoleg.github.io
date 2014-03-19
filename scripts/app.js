@@ -135,14 +135,15 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
             if (!(angular.isUndefined($rootScope.activeStream) || $rootScope.activeStream === null) && $rootScope.activeStream.id == $rootScope.datastreams[stream].id) {
                 $rootScope.activeStream = null;
                 $scope.chartData = null;
-                $scope.$broadcast('scroll.resize');
             }
             else {
                 xively.get(stream);
                 $rootScope.activeStream = $rootScope.datastreams[stream];
             }
-            //$location.hash("3");
-            //$ionicScrollDelegate.anchorScroll();
+            $location.hash("2");
+            $ionicScrollDelegate.anchorScroll();
+            $scope.$broadcast('scroll.resize');
+
         };
 
         $scope.showValueCtrl = function (stream) {
@@ -172,9 +173,11 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
                 _this.updateGauge($rootScope.activeStream, data[data.length - 1].value);
             }
             else {
+
                 $scope.chartData = [];
                 $scope.chartSettings.dataSource = $scope.chartData;
             }
+
             $location.hash("2");
             $ionicScrollDelegate.anchorScroll();
             $scope.$broadcast('scroll.resize');

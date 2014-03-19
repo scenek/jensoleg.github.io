@@ -258,12 +258,12 @@ angular.module('XivelyApp.services', ['ngResource'])
             feedHistory = Settings.get('feedHistory');
 
             xively.setKey(key);
-/*
+
             $rootScope.$apply(function () {
                 $rootScope.datastreams = {};
                 $rootScope.currentDataStream.data = [];
             });
-*/
+
             xively.datastream.list(feed_id, function (controls) {
                 var xivelyControls = [];
                 angular.forEach(controls, function (control) {
