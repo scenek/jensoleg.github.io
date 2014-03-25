@@ -176,11 +176,11 @@ angular.module('XivelyApp.directives', [])
             var img = $compile('<background-image></background-image>')(scope);
 
             $animate.enter(img, $element, null, function () {
-                console.log('Inserted');
+                // console.log('Inserted');
             });
             if (child) {
                 $animate.leave(angular.element(child), function () {
-                    console.log('Removed');
+                    // console.log('Removed');
                 });
             }
         };
@@ -192,7 +192,7 @@ angular.module('XivelyApp.directives', [])
                     if (!v) {
                         return;
                     }
-                    console.log('Active bg image changed', v);
+                    // console.log('Active bg image changed', v);
                     var item = v;
                     var url = "http://farm" + item.farm + ".static.flickr.com/" + item.server + "/" + item.id + "_" + item.secret + "_z.jpg";
                     animate($scope, $element, url);
@@ -213,4 +213,25 @@ angular.module('XivelyApp.directives', [])
                 }
             }
         }
+    })
+    .directive('orientationChange', function ($window, $timeout) {
+        return {
+            restrict: 'A',
+            replace: true,
+            scope: true,
+            compile: function (element, attr) {
+                return function ($scope, $element, $attr) {
+                    $window.addEventListener("orientationchange", function () {
+                        $timeout(function () {
+                            var windowHeight = window.innerHeight;
+                            var paddingTop = parseInt($element[0].style.paddingTop);
+                            var offsetHeight = $element[0].offsetHeight;
+                            $element[0].style.paddingTop = (windowHeight - offsetHeight + paddingTop - 25) + 'px';
+                            $scope.$broadcast('orientation.changed');
+                        }, 10);
+                    }, false);
+                }
+            }
+        };
     });
+

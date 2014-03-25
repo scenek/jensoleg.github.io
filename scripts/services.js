@@ -1,7 +1,17 @@
 angular.module('XivelyApp.services', ['ngResource'])
 
     .constant('DEFAULT_SETTINGS', {
-        'tempUnits': 'c', 'keyXively': '6kg3pKWwG6eyx2jRWNrTwSmpOFp9B6kSArV9kWm8iLkJ4gaR', 'feedXively': '673258092'
+        'tempUnits': 'c',
+        'keyXively': '6kg3pKWwG6eyx2jRWNrTwSmpOFp9B6kSArV9kWm8iLkJ4gaR',
+        'feedXively': '673258092',
+        'timeScale': 3600
+    })
+    .constant('SCANDIT_API_KEY', 'cFzwjrDwEeOHumeEBBIoRqXMaSSy36Uq4650VHVlShc')
+    .constant('WUNDERGROUND_API_KEY', 'c83d92d7b5befd29')
+    .constant('FLICKR_API_KEY', '504fd7414f6275eb5b657ddbfba80a2c')
+
+    .factory('cordova', function () {
+        return window.cordova; // assumes cordova has already been loaded on the page
     })
 
     .factory('Settings', function ($rootScope, DEFAULT_SETTINGS) {
@@ -57,7 +67,7 @@ angular.module('XivelyApp.services', ['ngResource'])
                     'latLng': new google.maps.LatLng(lat, lng)
                 }, function (results, status) {
                     if (status == google.maps.GeocoderStatus.OK) {
-                        console.log('Reverse', results);
+                        //console.log('Reverse', results);
                         if (results.length > 0) {
                             var r = results[0];
                             var a, types;
@@ -77,11 +87,11 @@ angular.module('XivelyApp.services', ['ngResource'])
                                     }
                                 }
                             }
-                            console.log('Reverse', parts);
+                            //console.log('Reverse', parts);
                             q.resolve(parts.join(' '));
                         }
                     } else {
-                        console.log('reverse fail', results, status);
+                        //console.log('reverse fail', results, status);
                         q.reject(results);
                     }
                 })
@@ -123,7 +133,7 @@ angular.module('XivelyApp.services', ['ngResource'])
             search: function (tags, lat, lng) {
                 var q = $q.defer();
 
-                console.log('Searching flickr for tags', tags);
+                //console.log('Searching flickr for tags', tags);
 
                 flickrSearch.get({
                     tags: tags,
@@ -215,9 +225,7 @@ angular.module('XivelyApp.services', ['ngResource'])
     .factory('xively', function ($rootScope, Settings) {
 
         var _this = this;
-        var service = {};
         var feed_id = Settings.get('feedXively');
-        var feedHistory = Settings.get('feedHistory');
 
         var controlTypes = ['data', 'ctrlValue', 'ctrlSwitch'];
 
@@ -251,19 +259,17 @@ angular.module('XivelyApp.services', ['ngResource'])
         };
 
 
-        _this.init = function () {
+        _this.init = function (init) {
 
             var key = Settings.get('keyXively');
             feed_id = Settings.get('feedXively');
-            feedHistory = Settings.get('feedHistory');
 
             xively.setKey(key);
 
-            $rootScope.$apply(function () {
+            if (init) {
                 $rootScope.datastreams = {};
                 $rootScope.currentDataStream.data = [];
-            });
-
+            }
             xively.datastream.list(feed_id, function (controls) {
                 var xivelyControls = [];
                 angular.forEach(controls, function (control) {
@@ -282,10 +288,10 @@ angular.module('XivelyApp.services', ['ngResource'])
         $rootScope.$watch('dataPoints', function (v) {
             angular.forEach($rootScope.dataPoints, function (ds) {
                 xively.datastream.get(feed_id, ds.id, function (data) {
-                    $rootScope.$apply(function () {
-                        _this.prepareData(data);
-                        $rootScope.datastreams[ds.id] = data;
-                    });
+                    //$rootScope.$apply(function () {
+                    _this.prepareData(data);
+                    $rootScope.datastreams[ds.id] = data;
+                    //});
                     xively.datastream.subscribe(feed_id, ds.id, function (event, newData) {
                         _this.prepareData(newData)
 
@@ -307,8 +313,17 @@ angular.module('XivelyApp.services', ['ngResource'])
         });
 
 
-        xively.refresh = function () {
-            _this.init();
+        xively.refresh = function (init) {
+            _this.init(init);
+        };
+
+        xively.setTimeScale = function (time) {
+            Settings.set('timeScale', time);
+            xively.get($rootScope.currentDataStream.id);
+        };
+
+        xively.getTimeScale = function () {
+            return Settings.get('timeScale');
         };
 
         xively.publish = function (datapoint, value) {
@@ -318,13 +333,8 @@ angular.module('XivelyApp.services', ['ngResource'])
         };
 
         xively.get = function (datapoint) {
-            //var date = new Date();
-            if (angular.isUndefined(feedHistory) || feedHistory == 0) {
-                feedHistory = 6;
-            }
-            var duration = feedHistory + 'hours';
-            // date.setHours(date.getHours() - 6);
-            xively.datapoint.history(feed_id, datapoint, {duration: duration, interval: 30, limit: 1000}, function (data) {
+            var duration = Settings.get('timeScale') + 'seconds';
+            xively.datapoint.history(feed_id, datapoint, {duration: duration, interval: 10, limit: 1000}, function (data) {
                 $rootScope.$apply(function () {
                     $rootScope.currentDataStream.id = datapoint;
                     $rootScope.currentDataStream.data = data;
@@ -333,4 +343,23 @@ angular.module('XivelyApp.services', ['ngResource'])
         };
 
         return xively;
+    })
+
+    .factory('scandit', function ($rootScope, Settings, cordova, SCANDIT_API_KEY) {
+
+        var _this = this;
+        _this.init = function () {
+        };
+
+        return {
+            scan: function (success, failure) {
+                // See below for all available options.
+                cordova.exec(success, failure, "ScanditSDK", "scan",
+                    [SCANDIT_API_KEY,
+                        {"beep": true,
+                            "1DScanning": true,
+                            "2DScanning": true}]);
+
+            }
+        };
     });
