@@ -1,16 +1,25 @@
 angular.module('XivelyApp.directives', [])
 
     .constant('WEATHER_ICONS', {
-        'partlycloudy': 'ion-ios7-partlysunny-outline',
-        'mostlycloudy': 'ion-ios7-partlysunny-outline',
-        'cloudy': 'ion-ios7-cloudy-outline',
-        'rain': 'ion-ios7-rainy-outline',
-        'tstorms': 'ion-ios7-thunderstorm-outline',
-        'sunny': 'ion-ios7-sunny-outline',
-        'clear': 'ion-ios7-sunny-outline',
-        'nt_clear': 'ion-ios7-moon-outline',
-        'gauge': 'ion-power',
-        'power': 'ion-ios7-gear-outline'
+        '01d': 'ion-ios7-sunny-outline',
+        '01n': 'ion-ios7-moon-outline',
+        '02d': 'ion-ios7-partlysunny-outline',
+        '02n': 'ion-ios7-cloudy-night-outline',
+        '03d': 'ion-ios7-cloudy-outline',
+        '03n': 'ion-ios7-cloudy-outline',
+        '04d': 'ion-ios7-cloudy-outline',
+        '04n': 'ion-ios7-cloudy-outline',
+        '09d': 'ion-ios7-rainy-outline',
+        '09n': 'ion-ios7-rainy-outline',
+        '10d': 'ion-ios7-rainy-outline',
+        '10n': 'ion-ios7-rainy-outline',
+        '11d': 'ion-ios7-thunderstorm-outline',
+        '11n': 'ion-ios7-thunderstorm-outline',
+        '13d': 'ion-ios7-snowy',
+        '13n': 'ion-ios7-snowy',
+        '50d': 'ion-ios7-drag',
+        '50n': 'ion-ios7-drag'
+
     })
 
     .directive('weatherIcon', function (WEATHER_ICONS) {
@@ -45,16 +54,9 @@ angular.module('XivelyApp.directives', [])
             restrict: 'E',
             replace: true,
             template: '<span class="current-time">{{currentTime}}</span>',
-            scope: {
-                localtz: '='
-            },
             link: function ($scope, $element, $attr) {
                 $timeout(function checkTime() {
-                    if ($scope.localtz) {
-//                        $scope.currentTime = $filter('date')(+(new Date), 'h:mm') + $scope.localtz;
-                        $scope.currentTime = $filter('date')(+(new Date), 'HH:mm');
-
-                    }
+                    $scope.currentTime = moment().format('HH:mm');
                     $timeout(checkTime, 500);
                 });
             }
@@ -69,54 +71,8 @@ angular.module('XivelyApp.directives', [])
             scope: true,
             compile: function (element, attr) {
                 return function ($scope, $element, $attr) {
-
-                    $rootScope.$on('settings.changed', function (settings) {
-                        var units = Settings.get('tempUnits');
-
-                        if ($scope.forecast) {
-
-                            var forecast = $scope.forecast;
-                            var current = $scope.current;
-
-                            if (units == 'f') {
-                                $scope.highTemp = forecast.forecastday[0].high.fahrenheit;
-                                $scope.lowTemp = forecast.forecastday[0].low.fahrenheit;
-                                $scope.currentTemp = Math.floor(current.temp_f);
-                            } else {
-                                $scope.highTemp = forecast.forecastday[0].high.celsius;
-                                $scope.lowTemp = forecast.forecastday[0].low.celsius;
-                                $scope.currentTemp = Math.floor(current.temp_c);
-                            }
-                        }
-                    });
-
-                    $scope.$watch('current', function (current) {
-                        var units = Settings.get('tempUnits');
-
-                        if (current) {
-                            if (units == 'f') {
-                                $scope.currentTemp = Math.floor(current.temp_f);
-                            } else {
-                                $scope.currentTemp = Math.floor(current.temp_c);
-                            }
-                        }
-                    });
-
-                    $scope.$watch('forecast', function (forecast) {
-                        var units = Settings.get('tempUnits');
-
-                        if (forecast) {
-                            if (units == 'f') {
-                                $scope.highTemp = forecast.forecastday[0].high.fahrenheit;
-                                $scope.lowTemp = forecast.forecastday[0].low.fahrenheit;
-                            } else {
-                                $scope.highTemp = forecast.forecastday[0].high.celsius;
-                                $scope.lowTemp = forecast.forecastday[0].low.celsius;
-                            }
-                        }
-                    });
-
                     // Delay so we are in the DOM and can calculate sizes
+
                     $timeout(function () {
                         var windowHeight = window.innerHeight;
                         var thisHeight = $element[0].offsetHeight;
@@ -126,8 +82,9 @@ angular.module('XivelyApp.directives', [])
                         angular.element(document.querySelector('.scroll-content')).css('-webkit-overflow-scrolling', 'auto');
                         $timeout(function () {
                             angular.element(document.querySelector('.scroll-content')).css('-webkit-overflow-scrolling', 'touch');
-                        }, 50);
+                        }, 100);
                     });
+
                 }
             }
         }

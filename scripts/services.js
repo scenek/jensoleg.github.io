@@ -7,8 +7,9 @@ angular.module('XivelyApp.services', ['ngResource'])
         'timeScale': 3600
     })
     .constant('SCANDIT_API_KEY', 'cFzwjrDwEeOHumeEBBIoRqXMaSSy36Uq4650VHVlShc')
-    .constant('WUNDERGROUND_API_KEY', 'c83d92d7b5befd29')
     .constant('FLICKR_API_KEY', '504fd7414f6275eb5b657ddbfba80a2c')
+    .constant('OPENWEATHER_API_KEY', 'a8c98220ff98a42893423c2f6627e39f')
+
 
     .factory('cordova', function () {
         return window.cordova; // assumes cordova has already been loaded on the page
@@ -50,7 +51,7 @@ angular.module('XivelyApp.services', ['ngResource'])
             getTempUnits: function () {
                 return _settings['tempUnits'];
             }
-        }
+        };
 
         // Save the settings to be safe
         obj.save();
@@ -94,7 +95,7 @@ angular.module('XivelyApp.services', ['ngResource'])
                         //console.log('reverse fail', results, status);
                         q.reject(results);
                     }
-                })
+                });
 
                 return q.promise;
             },
@@ -132,9 +133,6 @@ angular.module('XivelyApp.services', ['ngResource'])
         return {
             search: function (tags, lat, lng) {
                 var q = $q.defer();
-
-                //console.log('Searching flickr for tags', tags);
-
                 flickrSearch.get({
                     tags: tags,
                     lat: lat,
@@ -150,27 +148,32 @@ angular.module('XivelyApp.services', ['ngResource'])
         };
     })
 
-    .factory('Weather', function ($q, $resource, WUNDERGROUND_API_KEY) {
-        var baseUrl = 'http://api.wunderground.com/api/' + WUNDERGROUND_API_KEY;
+    .factory('Weather', function ($q, $resource, OPENWEATHER_API_KEY) {
 
-        var locationResource = $resource(baseUrl + '/geolookup/conditions/q/:coords.json', {
-            callback: 'JSON_CALLBACK'
+        var baseUrl = 'http://api.openweathermap.org/data/2.5';
+
+        var locationResource = $resource(baseUrl + '/weather', {
+            callback: 'JSON_CALLBACK',
+            APPID: OPENWEATHER_API_KEY
         }, {
             get: {
                 method: 'JSONP'
             }
         });
 
-        var forecastResource = $resource(baseUrl + '/forecast/q/:coords.json', {
-            callback: 'JSON_CALLBACK'
+        var forecastResource = $resource(baseUrl + '/forecast/daily', {
+            callback: 'JSON_CALLBACK',
+            APPID: OPENWEATHER_API_KEY
         }, {
             get: {
                 method: 'JSONP'
+
             }
         });
 
-        var hourlyResource = $resource(baseUrl + '/hourly/q/:coords.json', {
-            callback: 'JSON_CALLBACK'
+        var hourlyResource = $resource(baseUrl + '/forecast', {
+            callback: 'JSON_CALLBACK',
+            APPID: OPENWEATHER_API_KEY
         }, {
             get: {
                 method: 'JSONP'
@@ -182,7 +185,7 @@ angular.module('XivelyApp.services', ['ngResource'])
                 var q = $q.defer();
 
                 forecastResource.get({
-                    coords: lat + ',' + lng
+                    lat: lat, lon: lng
                 }, function (resp) {
                     q.resolve(resp);
                 }, function (httpResponse) {
@@ -196,7 +199,7 @@ angular.module('XivelyApp.services', ['ngResource'])
                 var q = $q.defer();
 
                 hourlyResource.get({
-                    coords: lat + ',' + lng
+                    lat: lat, lon: lng
                 }, function (resp) {
                     q.resolve(resp);
                 }, function (httpResponse) {
@@ -210,7 +213,7 @@ angular.module('XivelyApp.services', ['ngResource'])
                 var q = $q.defer();
 
                 locationResource.get({
-                    coords: lat + ',' + lng
+                    lat: lat, lon: lng
                 }, function (resp) {
                     q.resolve(resp);
                 }, function (error) {
@@ -293,7 +296,7 @@ angular.module('XivelyApp.services', ['ngResource'])
                     $rootScope.datastreams[ds.id] = data;
                     //});
                     xively.datastream.subscribe(feed_id, ds.id, function (event, newData) {
-                        _this.prepareData(newData)
+                        _this.prepareData(newData);
 
                         $rootScope.$apply(function () {
                             $rootScope.datastreams[ds.id] = newData;
@@ -353,12 +356,11 @@ angular.module('XivelyApp.services', ['ngResource'])
 
         return {
             scan: function (success, failure) {
-                // See below for all available options.
                 cordova.exec(success, failure, "ScanditSDK", "scan",
                     [SCANDIT_API_KEY,
                         {"beep": true,
-                            "1DScanning": true,
-                            "2DScanning": true}]);
+                          "1DScanning": true,
+                          "2DScanning": true}]);
 
             }
         };

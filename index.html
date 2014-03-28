@@ -32,8 +32,8 @@
     <header ng-cloak id="header" class="bar bar-header bar-clear">
         <h1 class="title">
             <span class="city"><i id="city-nav-icon"
-                                  class="icon ion-navigate"></i> {{current.display_location.city}}</span><br>
-            <current-time localtz="current.local_tz_short"></current-time>
+                                  class="icon ion-navigate"></i> {{currentCity}}</span><br>
+            <current-time></current-time>
         </h1>
         <button ng-click="showSettings()" class="button button-icon"><i class="icon ion-gear-a"></i></button>
     </header>
@@ -104,6 +104,7 @@
 <script src="bower_components/angular-resource/angular-resource.js"></script>
 <script src="bower_components/globalize/lib/globalize.js"></script>
 <script src="bower_components/lodash/dist/lodash.compat.js"></script>
+<script src="bower_components/momentjs/moment.js"></script>
 <!-- endbower -->
 <!-- endbuild -->
 

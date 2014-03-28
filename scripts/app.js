@@ -43,8 +43,7 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
 
         /* get graf time scale form settings */
         var ts = xively.getTimeScale();
-        var entry = _.find($scope.timescale, { 'value': ts });
-        $scope.timeScale = entry;
+        $scope.timeScale = _.find($scope.timescale, { 'value': ts });
 
 
         $scope.activeBgImageIndex = 0;
@@ -251,14 +250,14 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
 
         this.getForecast = function (lat, lng) {
             Weather.getForecast(lat, lng).then(function (resp) {
-                $scope.forecast = resp.forecast.simpleforecast;
+                $scope.forecast = resp.list;
             }, function (error) {
                 alert('Unable to get forecast. Try again later');
                 console.error(error);
             });
 
             Weather.getHourly(lat, lng).then(function (resp) {
-                $scope.hourly = resp.hourly_forecast;
+                $scope.hourly = resp.list;
             }, function (error) {
                 alert('Unable to get forecast. Try again later.');
                 console.error(error);
@@ -267,8 +266,8 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
 
         this.getCurrent = function (lat, lng) {
             Weather.getAtLocation(lat, lng).then(function (resp) {
-                $scope.current = resp.current_observation;
-                _this.getForecast(resp.location.lat, resp.location.lon);
+                $scope.current = resp;
+                _this.getForecast(resp.coord.lat, resp.coord.lon);
             }, function (error) {
                 alert('Unable to get current conditions');
                 console.error(error);
@@ -292,10 +291,13 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
                 var lat = position.coords.latitude;
                 var lng = position.coords.longitude;
 
+                _this.getCurrent(lat, lng);
+
                 Geo.reverseGeocode(lat, lng).then(function (locString) {
+                    $scope.currentCity = locString;
                     _this.getBackgroundImage(lat, lng, locString);
                 });
-                _this.getCurrent(lat, lng);
+
             }, function (error) {
                 alert('Unable to get current location: ' + error);
             });
@@ -313,7 +315,7 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
 
         // Watch deeply for settings changes, and save them
         // if necessary
-        $scope.$watch('settings', function (v) {
+        $scope.$watch('settings', function () {
             Settings.save();
         }, true);
 
