@@ -21,7 +21,7 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
         };
     })
 
-    .controller('WeatherCtrl', function ($window, $scope, $timeout, $ionicScrollDelegate, $rootScope, xively, Weather, Geo, Flickr, $ionicModal) {
+    .controller('WeatherCtrl', function ($window, $scope, $timeout, $ionicScrollDelegate, $ionicLoading, $rootScope, xively, Weather, Geo, Flickr, $ionicModal) {
         var _this = this;
 
         ionic.Platform.ready(function () {
@@ -31,19 +31,19 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
 
 
         $scope.timescale = [
-            {value: 300, text: '5 minutes', type: 'Raw datapoints'},
-            {value: 1800, text: '30 minutes', type: 'Raw datapoints'},
-            {value: 3600, text: '1 hours', type: 'Raw datapoints'},
-            {value: 21600, text: '6 hours', type: 'Averaged datapoints'},
-            {value: 86400, text: '1 day', type: 'Averaged datapoints'},
-            {value: 604800, text: '7 days', type: 'Averaged datapoints'},
-            {value: 2592000, text: '1 month', type: 'Averaged datapoints'},
-            {value: 7776000, text: '3 months', type: 'Averaged datapoints'}
+            {value: 300, interval: 0, text: '5 minutes', type: 'Raw datapoints'},
+            {value: 1800, interval: 0, text: '30 minutes', type: 'Raw datapoints'},
+            {value: 3600, interval: 0, text: '1 hours', type: 'Raw datapoints'},
+            {value: 21600, interval: 0, text: '6 hours', type: 'Averaged datapoints'},
+            {value: 86400, interval: 60, text: '1 day', type: 'Averaged datapoints'},
+            {value: 604800, interval: 900, text: '7 days', type: 'Averaged datapoints'},
+            {value: 2592000, interval: 3600, text: '1 month', type: 'Averaged datapoints'},
+            {value: 7776000, interval: 10800, text: '3 months', type: 'Averaged datapoints'}
         ];
 
         /* get graf time scale form settings */
         var ts = xively.getTimeScale();
-        $scope.timeScale = _.find($scope.timescale, { 'value': ts });
+        $scope.timeScale = _.find($scope.timescale, { 'value': ts.value });
 
 
         $scope.activeBgImageIndex = 0;
@@ -66,19 +66,22 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
                 offset: -10 }
         };
 
+        $scope.chartLabel =
+        {
+            argumentType: 'datetime',
+            label: { format: 'H:mm', color: 'white'},
+            valueMarginsEnabled: false,
+            tick: {
+                visible: true
+            }
+        };
+
         $scope.chartData = [];
 
         $scope.chartSettings =
         {
             dataSource: $scope.chartData,
-            argumentAxis: {
-                argumentType: 'datetime',
-                label: { format: 'H:mm', color: 'white'},
-                valueMarginsEnabled: false,
-                tick: {
-                    visible: true
-                }
-            },
+            argumentAxis: $scope.chartLabel,
             valueAxis: {
                 valueMarginsEnabled: false,
                 tick: {
@@ -129,7 +132,8 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
         };
 
         $scope.selectAction = function (time) {
-            xively.setTimeScale(time.value);
+            $scope.timeScale = _.find($scope.timescale, { 'value': time.value });
+            xively.setTimeScale($scope.timeScale);
         };
 
         $scope.showSettings = function () {
@@ -185,6 +189,14 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
                 $scope.chartData = data;
                 $scope.chartSettings.dataSource = $scope.chartData;
                 _this.updateGauge($rootScope.activeStream, data[data.length - 1].value);
+                if ($scope.timeScale.value <= 86400)
+                    $scope.chartLabel.label = { format: 'H:mm', color: 'white'};
+                else if ($scope.timeScale.value <= 604800)
+                    $scope.chartLabel.label = { format: 'ddd', color: 'white'}
+                else if ($scope.timeScale.value <= 2592000)
+                    $scope.chartLabel.label = { format: 'dd-MM', color: 'white'}
+                else
+                    $scope.chartLabel.label = { format: 'MMM', color: 'white'};
             }
             else {
                 $scope.chartData = [];
@@ -265,9 +277,13 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
         };
 
         this.getCurrent = function (lat, lng) {
+
+
             Weather.getAtLocation(lat, lng).then(function (resp) {
                 $scope.current = resp;
                 _this.getForecast(resp.coord.lat, resp.coord.lon);
+                $scope.loading.hide();
+
             }, function (error) {
                 alert('Unable to get current conditions');
                 console.error(error);
@@ -286,6 +302,14 @@ angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.fil
         $scope.refreshData = function (init) {
 
             xively.refresh(init);
+
+            if (init) {
+                $scope.loading = $ionicLoading.show({
+                    content: 'Finding your location... <i class="icon ion-loading-c">',
+                    showBackdrop: true,
+                    animation: 'fade-in'
+                });
+            }
 
             Geo.getLocation().then(function (position) {
                 var lat = position.coords.latitude;

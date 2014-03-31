@@ -222,13 +222,13 @@ h1, h2, h3, h4, h5 {
     text-align: right;
     color: #4a87ee;
 }
-
+/*
 #readings-scroll {
     height: 200px;
     margin: 10px 0px;
     background-color: inherit;
 }
-
+*/
 #readings-scroll .scroll {
     width: 1540px;
 }

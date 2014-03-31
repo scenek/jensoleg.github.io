@@ -42,7 +42,7 @@
         <ion-refresher on-refresh="refreshData(false)">
         </ion-refresher>
 
-        <div id="main-content">
+        <div id="main-content" ng-hide="current == null">
             <current-weather orientation-change></current-weather>
             <forecast ng-hide="viewXively"></forecast>
             <xively ng-show="viewXively"></xively>

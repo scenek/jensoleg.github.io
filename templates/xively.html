@@ -23,10 +23,11 @@
     </div>
 
     <div ng-show="chartData.length > 0">
+
         <ion-slide-box show-pager="false" id="readings-scroll">
             <ion-slide>
-                <div style="height: 200px" dx-chart="{bindingOptions: {dataSource: 'chartSettings.dataSource'},
-                                                        argumentAxis: chartSettings.argumentAxis,
+                <div style="height: 200px" dx-chart="{bindingOptions: {dataSource: 'chartSettings.dataSource',
+                                                                       argumentAxis: 'chartSettings.argumentAxis'},
                                                         valueAxis: chartSettings.valueAxis,
                                                         legend: chartSettings.legend,
                                                         tooltip: chartSettings.tooltip,

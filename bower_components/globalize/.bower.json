@@ -1,7 +1,7 @@
 {
   "name": "globalize",
   "homepage": "https://github.com/jquery/globalize",
-  "main": "./lib/globalize.js",
+  "main": "lib/globalize.js",
   "version": "0.1.1",
   "_release": "0.1.1",
   "_resolution": {
@@ -10,7 +10,6 @@
     "commit": "2cbbe9e30609735aab9dc29d8c53c5cd8f810149"
   },
   "_source": "git://github.com/jquery/globalize.git",
-  "_target": "~0.1.1",
-  "_originalSource": "globalize",
-  "_direct": true
+  "_target": "0.1.1",
+  "_originalSource": "globalize"
 }

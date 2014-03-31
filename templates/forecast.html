@@ -1,6 +1,6 @@
-<div id="forecast" class="weather-box">
+<div delegate-handle="forecast" id="forecast" class="weather-box">
     <h4 class="title">Forecast</h4>
-    <ion-scroll direction="x" id="forecast-scroll">
+    <ion-scroll delegate-handle="days" direction="x" id="forecast-scroll">
         <div class="hourly-hour" ng-repeat="hour in hourly">
             <div class="time" ng-bind="hour.dt_txt  | hourFormat"></div>
             <weather-icon icon="hour.weather[0].icon"></weather-icon>
@@ -9,7 +9,6 @@
     </ion-scroll>
     <!--div class="row" style="margin-top: -5px;" ng-repeat="day in forecast"-->
     <div class="row" ng-repeat="day in forecast">
-
         <div class="col"><span ng-bind="day.dt | weekday"></span></div>
         <div class="col">
             <weather-icon icon="day.weather[0].icon"></weather-icon>
