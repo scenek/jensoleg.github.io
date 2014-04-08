@@ -23,25 +23,26 @@
     </div>
 
     <div ng-show="chartData.length > 0">
-
-        <ion-slide-box show-pager="false" id="readings-scroll">
+        <ion-slide-box delegate-handle="charts" show-pager="false" id="readings-scroll">
             <ion-slide>
-                <div style="height: 200px" dx-chart="{bindingOptions: {dataSource: 'chartSettings.dataSource',
+                <div id="chartContainer" style="height: 200px" dx-chart="{bindingOptions: {dataSource: 'chartSettings.dataSource',
                                                                        argumentAxis: 'chartSettings.argumentAxis'},
                                                         valueAxis: chartSettings.valueAxis,
                                                         legend: chartSettings.legend,
                                                         tooltip: chartSettings.tooltip,
                                                         series: chartSettings.series,
-                                                        crosshair: chartSettings.crosshair
+                                                        crosshair: chartSettings.crosshair,
+                                                        loadingIndicator: chartSettings.loadingIndicator
                                                        }"></div>
             </ion-slide>
             <ion-slide>
-                <div style="height: 200px" dx-circular-gauge="{ bindingOptions: {subvalues : 'gaugeSettings.subvalues',
-                                                                       scale: 'gaugeSettings.scale',
+                <div style="height: 200px" dx-circular-gauge="{tooltip: gaugeSettings.tooltip,
+                                                               subvalueIndicator: gaugeSettings.subvalueIndicator,
+                                                               bindingOptions: {scale: 'gaugeSettings.scale',
                                                                        value: 'gaugeSettings.value',
-                                                                       rangeContainer: 'gaugeSettings.rangeContainer'},
-                                                                       tooltip: gaugeSettings.tooltip,
-                                                                       subvalueIndicator: gaugeSettings.subvalueIndicator}"></div>
+                                                                       rangeContainer: 'gaugeSettings.rangeContainer',
+                                                                       subvalues : 'gaugeSettings.subvalues'}
+                                                                       }"></div>
             </ion-slide>
         </ion-slide-box>
     </div>
@@ -53,16 +54,21 @@
         </div>
         <div class="col-icon col">
             <i class="col-icon-font icon ion-arrow-graph-up-right "
-               ng-show="readings.type == 'data'"
+               ng-show="readings.type == 'data' && (readings.id != activeStream.id || !loadXively)"
                ng-click="showData(readings.id)"
                ng-style="readings.id == activeStream.id && {'color': '#4a87ee'} || {'color': 'white'}">
+            </i>
+            <i class="col-icon-font icon ion-loading-d"
+               ng-show="readings.type == 'data' && loadXively && readings.id == activeStream.id"
+               style="color: #4a87ee">
             </i>
             <i class="col-icon-font icon ion-ios7-gear "
                ng-show="readings.type == 'ctrlValue' && !readings.isSelecting"
                ng-click="showValueCtrl(readings.id)">
             </i>
 
-            <div ng-show="readings.isSelecting" class="range range-positive range-select-input">
+            <div ng-show="readings.isSelecting && readings.type=='ctrlValue'"
+                 class="range range-positive range-select-input">
                 <input type="range"
                        class="domain-input"
                        min="{{readings.minDomain}}"
@@ -70,6 +76,21 @@
                        value="readings.newValue"
                        ng-model="readings.newValue">
             </div>
+            <i class="col-icon-font icon ion-ios7-clock"
+               ng-show="readings.type == 'ctrlTimeValue' && !readings.isSelecting"
+               ng-click="showValueCtrl(readings.id)">
+            </i>
+
+            <div ng-show="readings.type == 'ctrlTimeValue' && readings.isSelecting">
+                        <span class="checkbox-ctrls">
+                        <i ng-click="closeValueCtrl(readings.id)"
+                           class="icon ion-close-circled checkbox-close">
+                        </i>
+                        <i ng-click="setValueCtrl(readings.id)" class="icon ion-checkmark-circled checkbox-set">
+                        </i>
+                        </span>
+            </div>
+
             <div ng-show="readings.type == 'ctrlSwitch'">
                 <label class="checkbox checkbox-label">
                     <input
@@ -99,14 +120,24 @@
                             {{readings.newValue}}
                         </span>
                 </div>
-                    <span ng-hide="readings.isSelecting"
-                          class="temp-high">
-                        {{readings.newValue}}{{readings.unit.symbol}}
-                    </span></div>
+                <span ng-hide="readings.isSelecting"
+                      class="temp-high">
+                    {{readings.newValue}}{{readings.unit.symbol}}
+                </span>
+            </div>
+            <div ng-show="readings.type == 'ctrlTimeValue'">
+                <div ng-show="readings.isSelecting">
+                    <input class="custom replaced" ng-model="readings.newValue"
+                           ng-value="readings.newValue" type="time" step="60" focus-on="input-time">
+                </div>
+                <span ng-hide="readings.isSelecting"
+                      class="temp-high">
+                    {{readings.current_value}}{{readings.unit.symbol}}
+                </span>
+            </div>
+
         </div>
-
     </div>
-
     <div class="clearfix">
         <a ng-href="http://bobbytechnologies.dk" target="_blank">
             <div class="bobby-logo"></div>
