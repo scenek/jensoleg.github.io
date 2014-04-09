@@ -39,7 +39,7 @@ angular.module('XivelyApp', ['dx', 'ionic', 'ngAnimate', 'XivelyApp.services', '
         };
     })
 
-    .controller('IntroCtrl', function ($scope, $state, Settings, $animate, $ionicSlideBoxDelegate) {
+    .controller('IntroCtrl', function ($scope, $state, Settings, $ionicSlideBoxDelegate) {
         // Called to navigate to the main app
         $scope.startApp = function () {
             $state.go('main');
@@ -71,6 +71,10 @@ angular.module('XivelyApp', ['dx', 'ionic', 'ngAnimate', 'XivelyApp.services', '
                 StatusBar.hide();
         });
 
+        $scope.$on('$locationChangeStart', function (event, newUrl, oldUrl) {
+            event.preventDefault();
+        });
+
         $scope.timescale = [
             {value: 300, interval: 0, text: '5 minutes', type: 'Raw datapoints'},
             {value: 1800, interval: 0, text: '30 minutes', type: 'Raw datapoints'},
@@ -89,7 +93,8 @@ angular.module('XivelyApp', ['dx', 'ionic', 'ngAnimate', 'XivelyApp.services', '
 
         $scope.activeBgImageIndex = 0;
         $rootScope.currentDataStream = {};
-        $rootScope.activeStream = {};
+        $rootScope.activeStream = null;
+        $scope.activeStreamReady = false;
 
         $scope.gaugeScale = {};
         $scope.gaugeRange = {};
@@ -202,7 +207,9 @@ angular.module('XivelyApp', ['dx', 'ionic', 'ngAnimate', 'XivelyApp.services', '
         $scope.showData = function (stream) {
             if (!(angular.isUndefined($rootScope.activeStream) || $rootScope.activeStream === null) && $rootScope.activeStream.id == $rootScope.datastreams[stream].id) {
                 $rootScope.activeStream = null;
+                $scope.activeStreamReady = false;
                 $scope.chartData = null;
+                $ionicScrollDelegate.$getByHandle('details').scrollBottom();
             }
             else {
                 //$("#chartContainer").dxChart('instance').showLoadingIndicator();
@@ -210,8 +217,6 @@ angular.module('XivelyApp', ['dx', 'ionic', 'ngAnimate', 'XivelyApp.services', '
                 xively.get(stream);
                 $rootScope.activeStream = $rootScope.datastreams[stream];
             }
-
-            $ionicScrollDelegate.$getByHandle('details').scrollBottom();
         };
 
         $scope.showValueCtrl = function (stream) {
@@ -258,8 +263,9 @@ angular.module('XivelyApp', ['dx', 'ionic', 'ngAnimate', 'XivelyApp.services', '
                 $scope.gaugeSettings.value = $scope.gaugeValue;
             }
             $scope.loadXively = false;
-            $ionicScrollDelegate.$getByHandle('details').scrollBottom();
+            $scope.activeStreamReady = $rootScope.activeStream != null;
             $ionicSlideBoxDelegate.$getByHandle('charts').update();
+            $ionicScrollDelegate.$getByHandle('details').scrollBottom();
         });
 
         this.updateGauge = function (stream, newValue) {

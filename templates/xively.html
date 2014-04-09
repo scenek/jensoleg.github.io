@@ -1,5 +1,5 @@
 <div id="forecast" class="weather-box">
-    <div ng-show="activeStream != null">
+    <div ng-show="activeStreamReady">
         <h4 class="title">
             <div class="row" style="border-bottom: 0px">
                 <div class="col col-50">
@@ -139,7 +139,7 @@
         </div>
     </div>
     <div class="clearfix">
-        <a ng-href="http://bobbytechnologies.dk" target="_blank">
+        <a href="http://bobbytechnologies.dk" onClick="javascript:return openExternal(this)">
             <div class="bobby-logo"></div>
         </a>
     </div>

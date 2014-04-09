@@ -1,7 +1,7 @@
 <div id="current-weather">
     <h5>
         <weather-icon icon="current.weather[0].icon" id="current-icon"></weather-icon>
-        {{current.main.temp | temp}}
+        {{current.weather[0].description}}
     </h5>
     <h5>
         <span id="temp-hi"><i class="icon ion-arrow-up-c"></i> <span ng-bind="current.main.temp_max | temp"></span>&deg;</span>

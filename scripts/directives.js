@@ -42,7 +42,7 @@ angular.module('XivelyApp.directives', [])
                     if (icon in WEATHER_ICONS) {
                         $scope.weatherIcon = WEATHER_ICONS[icon];
                     } else {
-                        $scope.weatherIcon = WEATHER_ICONS['cloudy'];
+                        $scope.weatherIcon = WEATHER_ICONS['01d'];
                     }
                 });
             }

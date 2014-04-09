@@ -1,7 +1,7 @@
 body {
     text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
     background-color: black;
-    cursor: url('http://ionicframework.com/img/finger.png'), auto;
+    /*cursor: url('http://ionicframework.com/img/finger.png'), auto;*/
 }
 
 #wrapper {
@@ -479,33 +479,32 @@ optgroup {
     margin: 10px 0px;
 }
 
-.image-container {
-    position: relative;
-    /* you have to add a height here if your container isn't otherwise set
-       becuse the absolutely positioned image divs won't calculate the height
-       for you */
-    height: 100px;
+.my-switch-container {
+    position:relative;
+    height:500px;
 }
-
-.image-repeat {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.introcheck {
+*
+.my-switch-animation.ng-enter,
+.my-switch-animation.ng-leave {
     -webkit-transition:0.5s linear all;
     transition:0.5s linear all;
-    opacity:1;
+    height:500px;
+
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
 }
 
-.introcheck.ng-hide {
-    opacity:0;
+.my-switch-animation.ng-enter {
+    left:100%;
 }
 
-.introcheck.ng-hide-add, .introcheck.ng-hide-remove {
-    /* this needs to be here to make it visible during the animation
-       since the .ng-hide class is already on the element rendering
-       it as hidden. */
-    display:block!important;
+.my-switch-animation.ng-leave,
+.my-switch-animation.ng-enter.ng-enter-active {
+    left:0;
+}
+
+.my-switch-animation.ng-leave.ng-leave-active {
+    left:-100%;
 }
