@@ -1,12 +1,1 @@
-<div id="current-weather">
-    <h5>
-        <weather-icon icon="current.weather[0].icon" id="current-icon"></weather-icon>
-        {{current.weather[0].description}}
-    </h5>
-    <h5>
-        <span id="temp-hi"><i class="icon ion-arrow-up-c"></i> <span ng-bind="current.main.temp_max | temp"></span>&deg;</span>
-        <span id="temp-lo"><i class="icon ion-arrow-down-c"></i> <span ng-bind="current.main.temp_min | temp"></span>&deg;</span>
-    </h5>
-
-    <h1 class="current-temp" ng-click="toggleView()"><span ng-bind="current.main.temp | temp"></span>&deg;</h1>
-</div>
+<div id="current-weather"><h5><weather-icon icon="current.weather[0].icon" id="current-icon"></weather-icon>{{current.weather[0].description}}</h5><h5><span id="temp-hi"><i class="icon ion-arrow-up-c"></i> <span ng-bind="current.main.temp_max | temp"></span>&deg;</span> <span id="temp-lo"><i class="icon ion-arrow-down-c"></i> <span ng-bind="current.main.temp_min | temp"></span>&deg;</span></h5><h1 class="current-temp" ng-click="toggleView()"><span ng-bind="current.main.temp | temp"></span>&deg;</h1></div>
