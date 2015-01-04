@@ -1,4 +1,4 @@
-angular.module('XivelyApp', ['dx', 'ionic', 'ngAnimate', 'XivelyApp.services', 'XivelyApp.filters', 'XivelyApp.directives'])
+angular.module('XivelyApp', ['dx', 'ionic', 'XivelyApp.services', 'XivelyApp.filters', 'XivelyApp.directives'])
 
     .config(function ($stateProvider, $urlRouterProvider) {
 
@@ -71,7 +71,7 @@ angular.module('XivelyApp', ['dx', 'ionic', 'ngAnimate', 'XivelyApp.services', '
                 StatusBar.hide();
         });
 
-        $scope.$on('$locationChangeStart', function (event, newUrl, oldUrl) {
+        $rootScope.$on('$locationChangeStart', function (event, newUrl, oldUrl) {
             event.preventDefault();
         });
 
